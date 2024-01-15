@@ -1,1 +1,46 @@
+ // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+
+contract SuperToken is ERC20, ERC20Burnable, Ownable {
+    constructor(
+        string memory _superName,
+        string memory _superSymbol,
+        uint256 initialSuperSupply,
+        address initialSuperOwner
+    ) ERC20(_superName, _superSymbol) Ownable(initialSuperOwner) {
+        _mint(msg.sender, initialSuperSupply);
+    }
+
+    function mintSuperTokens(address recipient, uint256 SuperAmount) external onlyOwner {
+        _mint(recipient, SuperAmount);
+    }
+
+    function burnSuperTokens(uint256 SuperAmount) external {
+        _burn(msg.sender, SuperAmount);
+    }
+
+    function transferSuper(address collector, uint256 superAmount) public virtual  returns (bool) {
+        _transfer(_msgSender(), collector, superAmount);
+        return true;
+    }
+
+    function decimals() public view virtual override returns (uint8) {
+        return 18;
+    }
+
+    function isContract(address account) public view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        return size > 0;
+    }
+
+    function getBalance(address account) public view returns (uint256) {
+        return balanceOf(account);
+    }
+}
